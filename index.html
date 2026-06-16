@@ -1,113 +1,62 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-<meta charset="UTF-8">
-<title>Habit Tracker</title>
+<div id="tracker"></div>
 
 <style>
-body{
-    background:#111;
-    color:white;
-    font-family:Arial,sans-serif;
+#tracker{
     display:flex;
-    justify-content:center;
-    padding:30px;
-}
-
-.card{
-    width:500px;
-    background:#1b1b1b;
-    border-radius:15px;
-    padding:20px;
-}
-
-h2{
-    margin-top:0;
-    color:#f6b400;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(20,20px);
+    flex-wrap:wrap;
     gap:5px;
-    margin:20px 0;
 }
-
 .day{
-    width:20px;
-    height:20px;
-    background:#2d2d2d;
+    width:25px;
+    height:25px;
+    background:#333;
     border-radius:4px;
-}
-
-.done{
-    background:#f6b400;
-}
-
-.stats{
-    display:flex;
-    justify-content:space-between;
-    margin-top:20px;
-    text-align:center;
-}
-
-.stat-value{
-    font-size:32px;
-    color:#fff;
-}
-
-.stat-title{
-    color:#aaa;
+    cursor:pointer;
 }
 </style>
-</head>
 
-<body>
+<script>
+const tracker = document.getElementById("tracker");
 
-<div class="card">
-    <h2>morning-push-up</h2>
+function today(){
+    return new Date().toISOString().split("T")[0];
+}
 
-    <div class="grid">
-        <div class="day done"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
+let data = JSON.parse(localStorage.getItem("habit")) || {};
 
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-    </div>
+if(!data[today()]){
+    data[today()] = "#333333";
+}
 
-    <div class="stats">
-        <div>
-            <div class="stat-title">Goal</div>
-            <div class="stat-value">10</div>
-        </div>
+function save(){
+    localStorage.setItem("habit", JSON.stringify(data));
+}
 
-        <div>
-            <div class="stat-title">Days</div>
-            <div class="stat-value">66</div>
-        </div>
+function render(){
+    tracker.innerHTML = "";
 
-        <div>
-            <div class="stat-title">Records</div>
-            <div class="stat-value">18</div>
-        </div>
-    </div>
-</div>
+    Object.keys(data).sort().forEach(date => {
+        const box = document.createElement("div");
+        box.className = "day";
+        box.style.background = data[date];
 
-</body>
-</html>
+        box.onclick = () => {
+            const color = prompt(
+                "Color:",
+                data[date]
+            );
+
+            if(color){
+                data[date] = color;
+                save();
+                render();
+            }
+        };
+
+        tracker.appendChild(box);
+    });
+}
+
+save();
+render();
+</script>
