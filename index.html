@@ -249,36 +249,118 @@ startText.innerHTML=
 
 
 countText.innerHTML=
-"روز: "+totalDays;
+<script>
 
+const box=document.getElementById("box");
+
+let data = JSON.parse(localStorage.getItem("habit")) || {
+    start: new Date().toISOString().split("T")[0],
+    days:{}
+};
+
+
+let colors={
+1:"#fff9c4",
+2:"#fff176",
+3:"#ffd54f",
+4:"#ffc107",
+5:"#ff9800"
+};
+
+
+function today(){
+    return new Date().toISOString().split("T")[0];
+}
+
+
+
+function updateDays(){
+
+let t = today();
+
+
+if(!data.days[t]){
+    data.days[t]=0;
+}
+
+
+localStorage.setItem(
+"habit",
+JSON.stringify(data)
+);
 
 }
 
 
 
+function draw(){
+
+box.innerHTML="";
+
+updateDays();
 
 
-function clearData(){
+let keys=Object.keys(data.days);
 
 
-localStorage.removeItem("habit");
+keys.forEach((day)=>{
 
 
-location.reload();
+let sq=document.createElement("div");
+
+sq.className="square";
+
+
+if(data.days[day]){
+    sq.style.background=colors[data.days[day]];
+}
+
+
+
+if(day==today()){
+
+
+sq.onclick=function(){
+
+let score=prompt(
+"نمره امروز 1 تا 5"
+);
+
+
+if(score>=1 && score<=5){
+
+data.days[day]=score;
+
+
+localStorage.setItem(
+"habit",
+JSON.stringify(data)
+);
+
+
+draw();
+
+}
+
+}
 
 
 }
 
 
+box.appendChild(sq);
 
+
+});
+
+
+}
 
 
 draw();
 
 
-
 </script>
-
 
 </body>
 </html>
