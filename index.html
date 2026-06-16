@@ -1,176 +1,284 @@
 <!DOCTYPE html>
+
 <html lang="fa">
 <head>
+
 <meta charset="UTF-8">
+
 <title>Habit Tracker</title>
 
+<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+
+
 <style>
+
 body{
-    background:#111;
-    color:white;
-    font-family:Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    padding:30px;
+background:#111;
+color:white;
+font-family:Arial;
+text-align:center;
 }
 
-.card{
-    width:500px;
-    background:#1b1b1b;
-    border-radius:15px;
-    padding:20px;
+
+#box{
+
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+margin:30px auto;
+max-width:700px;
+
 }
 
-h2{
-    margin-top:0;
-    color:#f6b400;
+
+.square{
+
+width:30px;
+height:30px;
+background:#333;
+border-radius:5px;
+cursor:pointer;
+
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(20,20px);
-    gap:5px;
-    margin:20px 0;
+
+button{
+
+padding:10px 20px;
+border:0;
+border-radius:10px;
+cursor:pointer;
+
 }
 
-.day{
-    width:20px;
-    height:20px;
-    background:#2d2d2d;
-    border-radius:4px;
-}
 
-.done{
-    background:#f6b400;
-}
-
-.stats{
-    display:flex;
-    justify-content:space-between;
-    margin-top:20px;
-    text-align:center;
-}
-
-.stat-value{
-    font-size:32px;
-    color:#fff;
-}
-
-.stat-title{
-    color:#aaa;
-}
 </style>
+
+
 </head>
+
 
 <body>
 
-<div class="card">
-    <h2>morning-push-up</h2>
 
-    <div class="grid">
-        <div class="day done"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
+<h1>Habit Tracker</h1>
 
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day done"></div>
-    </div>
 
-    <div class="stats">
-        <div>
-            <div class="stat-title">Goal</div>
-            <div class="stat-value">10</div>
-        </div>
+<h3 id="start"></h3>
 
-        <div>
-            <div class="stat-title">Days</div>
-            <div class="stat-value">66</div>
-        </div>
+<h3 id="count"></h3>
 
-        <div>
-            <div class="stat-title">Records</div>
-            <div class="stat-value">18</div>
-        </div>
-    </div>
-</div>
+
+<div id="box"></div>
+
+
+<button onclick="clearData()">
+پاک کردن
+</button>
+
+
+
+
+<script>
+
+
+const box=document.getElementById("box");
+
+const startText=document.getElementById("start");
+
+const countText=document.getElementById("count");
+
+
+
+
+let data=JSON.parse(
+localStorage.getItem("habit")
+)
+||
+{
+
+start:getJDate(),
+
+days:{}
+
+};
+
+
+
+
+let colors={
+
+1:"#fff9c4",
+
+2:"#fff176",
+
+3:"#ffd54f",
+
+4:"#ffc107",
+
+5:"#ff9800"
+
+};
+
+
+
+
+
+function getJDate(){
+
+
+let d=new Date();
+
+
+let j=jalaali.toJalaali(
+
+d.getFullYear(),
+
+d.getMonth()+1,
+
+d.getDate()
+
+);
+
+
+return `${j.jy}-${j.jm}-${j.jd}`;
+
+
+}
+
+
+
+
+
+function save(){
+
+
+localStorage.setItem(
+"habit",
+JSON.stringify(data)
+);
+
+
+}
+
+
+
+
+
+function draw(){
+
+
+box.innerHTML="";
+
+
+
+let totalDays =
+Math.max(
+1,
+Math.floor(
+(new Date()-new Date(data.start))/86400000
+)+1
+);
+
+
+
+for(let i=0;i<totalDays;i++){
+
+
+
+let sq=document.createElement("div");
+
+
+sq.className="square";
+
+
+
+if(data.days[i]){
+
+sq.style.background=
+colors[data.days[i]];
+
+}
+
+
+
+if(i==totalDays-1){
+
+
+sq.onclick=function(){
+
+
+
+let score=prompt(
+"نمره امروز (1 تا 5)"
+);
+
+
+
+if(score>=1 && score<=5){
+
+
+data.days[i]=score;
+
+
+save();
+
+
+draw();
+
+
+}
+
+
+};
+
+
+}
+
+
+
+box.appendChild(sq);
+
+
+}
+
+
+
+startText.innerHTML=
+"شروع: "+data.start;
+
+
+countText.innerHTML=
+"روز: "+totalDays;
+
+
+}
+
+
+
+
+
+function clearData(){
+
+
+localStorage.removeItem("habit");
+
+
+location.reload();
+
+
+}
+
+
+
+
+
+draw();
+
+
+
+</script>
+
 
 </body>
 </html>
-
-<div id="tracker"></div>
-
-<style>
-#tracker{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-}
-.day{
-    width:25px;
-    height:25px;
-    background:#333;
-    border-radius:4px;
-    cursor:pointer;
-}
-</style>
-
-<script>
-const tracker = document.getElementById("tracker");
-
-function today(){
-    return new Date().toISOString().split("T")[0];
-}
-
-let data = JSON.parse(localStorage.getItem("habit")) || {};
-
-if(!data[today()]){
-    data[today()] = "#333333";
-}
-
-function save(){
-    localStorage.setItem("habit", JSON.stringify(data));
-}
-
-function render(){
-    tracker.innerHTML = "";
-
-    Object.keys(data).sort().forEach(date => {
-        const box = document.createElement("div");
-        box.className = "day";
-        box.style.background = data[date];
-
-        box.onclick = () => {
-            const color = prompt(
-                "Color:",
-                data[date]
-            );
-
-            if(color){
-                data[date] = color;
-                save();
-                render();
-            }
-        };
-
-        tracker.appendChild(box);
-    });
-}
-
-save();
-render();
-</script>
