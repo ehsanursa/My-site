@@ -1,57 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <title>روز شمار ساده</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        #countdown {
-            font-size: 48px;
-            font-weight: bold;
-            background: #f0f0f0;
-            display: inline-block;
-            padding: 20px 40px;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .label {
-            font-size: 20px;
-            margin-top: 10px;
-            color: #555;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Habit Tracker</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:30px;
+}
+
+.card{
+    width:500px;
+    background:#1b1b1b;
+    border-radius:15px;
+    padding:20px;
+}
+
+h2{
+    margin-top:0;
+    color:#f6b400;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(20,20px);
+    gap:5px;
+    margin:20px 0;
+}
+
+.day{
+    width:20px;
+    height:20px;
+    background:#2d2d2d;
+    border-radius:4px;
+}
+
+.done{
+    background:#f6b400;
+}
+
+.stats{
+    display:flex;
+    justify-content:space-between;
+    margin-top:20px;
+    text-align:center;
+}
+
+.stat-value{
+    font-size:32px;
+    color:#fff;
+}
+
+.stat-title{
+    color:#aaa;
+}
+</style>
 </head>
+
 <body>
-    <h1>📅 روز شمار تا رویداد مورد نظر</h1>
-    <div id="countdown">--</div>
-    <div class="label">روز باقی‌مانده</div>
 
-    <script>
-        // تاریخ هدف را اینجا تغییر بده (سال، ماه، روز)
-        // توجه: ماه از 0 تا 11 است – یعنی 0 = ژانویه، 11 = دسامبر
-        // مثال: 20 اسفند 1404 شمسی معادل 11 مارس 2025
-        const targetDate = new Date(2025, 2, 20); // 20 مارس 2025
+<div class="card">
+    <h2>morning-push-up</h2>
 
-        function updateCountdown() {
-            const now = new Date();
-            const difference = targetDate - now;
+    <div class="grid">
+        <div class="day done"></div>
+        <div class="day done"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day done"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day done"></div>
+        <div class="day"></div>
+        <div class="day"></div>
 
-            if (difference <= 0) {
-                document.getElementById('countdown').innerHTML = '🎉 رویداد فرا رسید 🎉';
-                return;
-            }
+        <div class="day"></div>
+        <div class="day done"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day done"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day done"></div>
+    </div>
 
-            // تبدیل میلی‌ثانیه به روز
-            const daysLeft = Math.floor(difference / (1000 * 60 * 60 * 24));
-            document.getElementById('countdown').innerHTML = daysLeft;
-        }
+    <div class="stats">
+        <div>
+            <div class="stat-title">Goal</div>
+            <div class="stat-value">10</div>
+        </div>
 
-        updateCountdown(); // اجرا در لحظه
-        setInterval(updateCountdown, 86400000); // به‌روزرسانی هر 24 ساعت
-    </script>
+        <div>
+            <div class="stat-title">Days</div>
+            <div class="stat-value">66</div>
+        </div>
+
+        <div>
+            <div class="stat-title">Records</div>
+            <div class="stat-value">18</div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
