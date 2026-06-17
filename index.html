@@ -42,6 +42,9 @@ body{
 
 <div id="tracker"></div>
 
+<button onclick="resetTracker()">
+پاک کردن همه اطلاعات</button>
+    
 <script>
 
 function getJalaliToday(){
@@ -163,6 +166,19 @@ data.dates.forEach(date=>{
 
 });
 
+    function resetTracker(){
+
+    if(confirm("همه اطلاعات پاک شود؟")){
+
+        localStorage.removeItem(
+            "habitTracker"
+        );
+
+        location.reload();
+
+    }
+
+}
 </script>
 
 </body>
