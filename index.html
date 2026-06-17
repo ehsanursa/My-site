@@ -68,6 +68,7 @@
         "https://kpzeucewcljedueqkwia.supabase.co",
         "sb_publishable_5MNLwjQCK1tyNrYbFSAQ-w_XkieGR8l",
       );
+      console.log("supabase ok");
 
       const colors = {
         0: "#333",
@@ -96,7 +97,7 @@
           return;
         }
 
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
           await supabase.from("tracker").insert({
             day: getJalaliToday(),
             color: 0,
