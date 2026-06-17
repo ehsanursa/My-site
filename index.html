@@ -5,15 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Habit Tracker</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-    <script>
-      const supabase = window.supabase.createClient(
-        "https://kpzeucewcljedueqkwia.supabase.co",
-        "sb_publishable_5MNLwjQCK1tyNrYbFSAQ-w_XkieGR8l",
-      );
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
       body {
@@ -97,10 +89,7 @@
       }
 
       async function loadTracker() {
-        let { data, error } = await supabase
-          .from("tracker")
-          .select("*")
-          .select("*")
+        let { data, error } = await supabase.from("tracker").select("*");
 
         if (error) {
           console.log(error);
@@ -108,7 +97,7 @@
         }
 
         if (data.length === 0) {
-          await supabase.from("tracker").insert({
+          await client.form("tracker").insert({
             day: getJalaliToday(),
             color: 0,
           });
@@ -159,7 +148,7 @@
 
       async function resetTracker() {
         if (confirm("همه اطلاعات پاک شود؟")) {
-          await supabase.from("tracker").delete().neq("day", "");
+          await client.form("tracker").delete().neq("day", "");
 
           location.reload();
         }
@@ -194,9 +183,10 @@
       }
 
       function resetStreak() {
+        if (!streak) return;
+
         if (confirm("ریست شود؟")) {
           streak.start = new Date().toISOString().split("T")[0];
-
           streak.resets++;
 
           localStorage.setItem("streak", JSON.stringify(streak));
