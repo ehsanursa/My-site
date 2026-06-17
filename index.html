@@ -6,6 +6,14 @@
     <title>Habit Tracker</title>
 
     <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+    <script>
+      const supabase = window.supabase.createClient(
+        "https://kpzeucewcljedueqkwia.supabase.co",
+        "sb_publishable_5MNLwjQCK1tyNrYbFSAQ-w_XkieGR8l",
+      );
+    </script>
 
     <style>
       body {
@@ -64,17 +72,10 @@
     <div id="streakBox"></div>
 
     <script>
-      function getJalaliToday() {
-        const d = new Date();
-
-        const j = jalaali.toJalaali(
-          d.getFullYear(),
-          d.getMonth() + 1,
-          d.getDate(),
-        );
-
-        return `${j.jy}/${j.jm}/${j.jd}`;
-      }
+      const supabase = window.supabase.createClient(
+        "https://kpzeucewcljedueqkwia.supabase.co",
+        "sb_publishable_5MNLwjQCK1tyNrYbFSAQ-w_XkieGR8l",
+      );
 
       const colors = {
         0: "#333",
@@ -85,71 +86,88 @@
         5: "#ff9800",
       };
 
-      let data = JSON.parse(localStorage.getItem("habitTracker"));
-
-      if (!data) {
-        data = {
-          start: getJalaliToday(),
-          dates: [getJalaliToday()],
-          scores: {},
-        };
-
-        localStorage.setItem("habitTracker", JSON.stringify(data));
+      function getJalaliToday() {
+        const d = new Date();
+        const j = jalaali.toJalaali(
+          d.getFullYear(),
+          d.getMonth() + 1,
+          d.getDate(),
+        );
+        return `${j.jy}/${j.jm}/${j.jd}`;
       }
 
-      const today = getJalaliToday();
+      async function loadTracker() {
+        let { data, error } = await supabase
+          .from("tracker")
+          .select("*")
+          .order("created_at");
 
-      const lastDate = data.dates[data.dates.length - 1];
-
-      if (lastDate !== today) {
-        data.dates.push(today);
-
-        localStorage.setItem("habitTracker", JSON.stringify(data));
-      }
-
-      document.getElementById("startDate").innerText =
-        "تاریخ شروع: " + data.start;
-
-      document.getElementById("daysCount").innerText =
-        "تعداد روزها: " + data.dates.length;
-
-      const tracker = document.getElementById("tracker");
-
-      data.dates.forEach((date) => {
-        const box = document.createElement("div");
-
-        box.className = "day";
-
-        const score = data.scores[date] || 0;
-
-        box.style.background = colors[score];
-
-        if (date === today) {
-          box.onclick = () => {
-            let n = prompt("نمره امروز (1 تا 5)");
-
-            n = Number(n);
-
-            if (n >= 1 && n <= 5) {
-              data.scores[date] = n;
-
-              localStorage.setItem("habitTracker", JSON.stringify(data));
-
-              box.style.background = colors[n];
-            }
-          };
+        if (error) {
+          console.log(error);
+          return;
         }
 
-        tracker.appendChild(box);
-      });
+        if (data.length === 0) {
+          await supabase.from("tracker").insert({
+            day: getJalaliToday(),
+            color: 0,
+          });
 
-      function resetTracker() {
+          data = [
+            {
+              day: getJalaliToday(),
+              color: 0,
+            },
+          ];
+        }
+
+        document.getElementById("startDate").innerText =
+          "تاریخ شروع: " + data[0].day;
+
+        document.getElementById("daysCount").innerText =
+          "تعداد روزها: " + data.length;
+
+        let box = document.getElementById("tracker");
+        box.innerHTML = "";
+
+        data.forEach((item) => {
+          let d = document.createElement("div");
+
+          d.className = "day";
+          d.style.background = colors[item.color];
+
+          if (item.day === getJalaliToday()) {
+            d.onclick = async () => {
+              let n = Number(prompt("نمره امروز 1 تا 5"));
+
+              if (n >= 1 && n <= 5) {
+                await supabase
+                  .from("tracker")
+                  .update({
+                    color: n,
+                  })
+                  .eq("day", item.day);
+
+                d.style.background = colors[n];
+              }
+            };
+          }
+
+          box.appendChild(d);
+        });
+      }
+
+      async function resetTracker() {
         if (confirm("همه اطلاعات پاک شود؟")) {
-          localStorage.removeItem("habitTracker");
+          await supabase.from("tracker").delete().neq("day", "");
 
           location.reload();
         }
       }
+
+      loadTracker();
+
+      // streak
 
       let streak = JSON.parse(localStorage.getItem("streak")) || {
         start: new Date().toISOString().split("T")[0],
@@ -158,11 +176,9 @@
 
       function drawStreak() {
         let box = document.getElementById("streakBox");
-
         box.innerHTML = "";
 
         let start = new Date(streak.start);
-
         let now = new Date();
 
         let days = Math.floor((now - start) / 86400000) + 1;
@@ -172,9 +188,7 @@
 
         for (let i = 0; i < days; i++) {
           let d = document.createElement("div");
-
           d.className = "green";
-
           box.appendChild(d);
         }
       }
