@@ -89,7 +89,7 @@
       }
 
       async function loadTracker() {
-        let { data, error } = await supabase.from("tracker").select("*");
+        let { data, error } = await client.from("tracker").select("*");
 
         if (error) {
           console.log(error);
@@ -97,7 +97,7 @@
         }
 
         if (!data || data.length === 0) {
-          await supabase.from("tracker").insert({
+          await client.from("tracker").insert({
             day: getJalaliToday(),
             color: 0,
           });
@@ -148,7 +148,7 @@
 
       async function resetTracker() {
         if (confirm("همه اطلاعات پاک شود؟")) {
-          await supabase.from("tracker").delete().neq("day", "");
+          await client.from("tracker").delete().neq("day", "");
 
           location.reload();
         }
