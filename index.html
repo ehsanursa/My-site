@@ -154,6 +154,7 @@ if(!error){
       }
 
       async function resetTracker() {
+       alert("سلام");
         if (confirm("همه اطلاعات پاک شود؟")) {
           await client.from("tracker").delete().neq("day", "");
 
