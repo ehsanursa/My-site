@@ -97,7 +97,7 @@
         }
 
         if (data.length === 0) {
-          await supabase.form("tracker").insert({
+          await supabase.from("tracker").insert({
             day: getJalaliToday(),
             color: 0,
           });
@@ -148,7 +148,7 @@
 
       async function resetTracker() {
         if (confirm("همه اطلاعات پاک شود؟")) {
-          await supabase.form("tracker").delete().neq("day", "");
+          await supabase.from("tracker").delete().neq("day", "");
 
           location.reload();
         }
