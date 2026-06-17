@@ -100,7 +100,7 @@
         let { data, error } = await supabase
           .from("tracker")
           .select("*")
-          .order("created_at");
+          .select("*")
 
         if (error) {
           console.log(error);
