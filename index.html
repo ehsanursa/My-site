@@ -1,364 +1,167 @@
 <!DOCTYPE html>
-
 <html lang="fa">
 <head>
-
 <meta charset="UTF-8">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Habit Tracker</title>
 
 <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
 
-
 <style>
 
 body{
-background:#111;
-color:white;
-font-family:Arial;
-text-align:center;
+    background:#111;
+    color:white;
+    font-family:tahoma;
+    text-align:center;
+    padding:20px;
 }
 
-
-#box{
-
-display:flex;
-flex-wrap:wrap;
-gap:6px;
-margin:30px auto;
-max-width:700px;
-
+#tracker{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    max-width:700px;
+    margin:auto;
 }
 
-
-.square{
-
-width:30px;
-height:30px;
-background:#333;
-border-radius:5px;
-cursor:pointer;
-
+.day{
+    width:30px;
+    height:30px;
+    background:#333;
+    border-radius:5px;
+    cursor:pointer;
 }
-
-
-button{
-
-padding:10px 20px;
-border:0;
-border-radius:10px;
-cursor:pointer;
-
-}
-
 
 </style>
-
-
 </head>
-
-
 <body>
 
+<h2 id="startDate"></h2>
+<h3 id="daysCount"></h3>
 
-<h1>Habit Tracker</h1>
-
-
-<h3 id="start"></h3>
-
-<h3 id="count"></h3>
-
-
-<div id="box"></div>
-
-
-<button onclick="clearData()">
-پاک کردن
-</button>
-
-
-
+<div id="tracker"></div>
 
 <script>
 
+function getJalaliToday(){
 
-const box=document.getElementById("box");
+    const d = new Date();
 
-const startText=document.getElementById("start");
+    const j = jalaali.toJalaali(
+        d.getFullYear(),
+        d.getMonth()+1,
+        d.getDate()
+    );
 
-const countText=document.getElementById("count");
+    return `${j.jy}/${j.jm}/${j.jd}`;
+}
 
 
-
-
-let data=JSON.parse(
-localStorage.getItem("habit")
-)
-||
-{
-
-start:getJDate(),
-
-days:{}
-
+const colors = {
+    0:"#333",
+    1:"#fff9c4",
+    2:"#fff176",
+    3:"#ffd54f",
+    4:"#ffc107",
+    5:"#ff9800"
 };
 
 
-
-
-let colors={
-
-1:"#fff9c4",
-
-2:"#fff176",
-
-3:"#ffd54f",
-
-4:"#ffc107",
-
-5:"#ff9800"
-
-};
-
-
-
-
-
-function getJDate(){
-
-
-let d=new Date();
-
-
-let j=jalaali.toJalaali(
-
-d.getFullYear(),
-
-d.getMonth()+1,
-
-d.getDate()
-
+let data = JSON.parse(
+    localStorage.getItem("habitTracker")
 );
 
+if(!data){
 
-return `${j.jy}-${j.jm}-${j.jd}`;
+    data = {
+        start:getJalaliToday(),
+        dates:[getJalaliToday()],
+        scores:{}
+    };
 
-
+    localStorage.setItem(
+        "habitTracker",
+        JSON.stringify(data)
+    );
 }
 
 
+const today = getJalaliToday();
+
+const lastDate =
+data.dates[data.dates.length-1];
 
 
+if(lastDate !== today){
 
-function save(){
+    data.dates.push(today);
 
-
-localStorage.setItem(
-"habit",
-JSON.stringify(data)
-);
-
-
+    localStorage.setItem(
+        "habitTracker",
+        JSON.stringify(data)
+    );
 }
 
 
+document.getElementById("startDate")
+.innerText =
+"تاریخ شروع: " + data.start;
 
 
+document.getElementById("daysCount")
+.innerText =
+"تعداد روزها: " + data.dates.length;
 
-function draw(){
 
+const tracker =
+document.getElementById("tracker");
 
-box.innerHTML="";
 
+data.dates.forEach(date=>{
 
+    const box =
+    document.createElement("div");
 
-let totalDays =
-Math.max(
-1,
-Math.floor(
-(new Date()-new Date(data.start))/86400000
-)+1
-);
+    box.className="day";
 
+    const score =
+    data.scores[date] || 0;
 
+    box.style.background =
+    colors[score];
 
-for(let i=0;i<totalDays;i++){
 
+    if(date === today){
 
+        box.onclick = ()=>{
 
-let sq=document.createElement("div");
+            let n = prompt(
+                "نمره امروز (1 تا 5)"
+            );
 
+            n = Number(n);
 
-sq.className="square";
+            if(n>=1 && n<=5){
 
+                data.scores[date]=n;
 
+                localStorage.setItem(
+                    "habitTracker",
+                    JSON.stringify(data)
+                );
 
-if(data.days[i]){
+                box.style.background =
+                colors[n];
+            }
 
-sq.style.background=
-colors[data.days[i]];
+        };
 
-}
+    }
 
-
-
-if(i==totalDays-1){
-
-
-sq.onclick=function(){
-
-
-
-let score=prompt(
-"نمره امروز (1 تا 5)"
-);
-
-
-
-if(score>=1 && score<=5){
-
-
-data.days[i]=score;
-
-
-save();
-
-
-draw();
-
-
-}
-
-
-};
-
-
-}
-
-
-
-box.appendChild(sq);
-
-
-}
-
-
-
-startText.innerHTML=
-"شروع: "+data.start;
-
-
-countText.innerHTML=
-<script>
-
-const box=document.getElementById("box");
-
-let data = JSON.parse(localStorage.getItem("habit")) || {
-    start: new Date().toISOString().split("T")[0],
-    days:{}
-};
-
-
-let colors={
-1:"#fff9c4",
-2:"#fff176",
-3:"#ffd54f",
-4:"#ffc107",
-5:"#ff9800"
-};
-
-
-function today(){
-    return new Date().toISOString().split("T")[0];
-}
-
-
-
-function updateDays(){
-
-let t = today();
-
-
-if(!data.days[t]){
-    data.days[t]=0;
-}
-
-
-localStorage.setItem(
-"habit",
-JSON.stringify(data)
-);
-
-}
-
-
-
-function draw(){
-
-box.innerHTML="";
-
-updateDays();
-
-
-let keys=Object.keys(data.days);
-
-
-keys.forEach((day)=>{
-
-
-let sq=document.createElement("div");
-
-sq.className="square";
-
-
-if(data.days[day]){
-    sq.style.background=colors[data.days[day]];
-}
-
-
-
-if(day==today()){
-
-
-sq.onclick=function(){
-
-let score=prompt(
-"نمره امروز 1 تا 5"
-);
-
-
-if(score>=1 && score<=5){
-
-data.days[day]=score;
-
-
-localStorage.setItem(
-"habit",
-JSON.stringify(data)
-);
-
-
-draw();
-
-}
-
-}
-
-
-}
-
-
-box.appendChild(sq);
-
+    tracker.appendChild(box);
 
 });
-
-
-}
-
-
-draw();
-
 
 </script>
 
