@@ -6,7 +6,7 @@
     <title>Habit Tracker</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
     <style>
       body {
         background: #111;
@@ -97,7 +97,7 @@
         }
 
         if (data.length === 0) {
-          await client.form("tracker").insert({
+          await supabase.form("tracker").insert({
             day: getJalaliToday(),
             color: 0,
           });
@@ -148,7 +148,7 @@
 
       async function resetTracker() {
         if (confirm("همه اطلاعات پاک شود؟")) {
-          await client.form("tracker").delete().neq("day", "");
+          await supabase.form("tracker").delete().neq("day", "");
 
           location.reload();
         }
@@ -199,3 +199,4 @@
     </script>
   </body>
 </html>
+
