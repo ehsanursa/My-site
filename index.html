@@ -130,7 +130,7 @@
               let n = Number(prompt("نمره امروز 1 تا 5"));
 
               if (n >= 1 && n <= 5) {
-                await supabase
+                await cliennt
                   .from("tracker")
                   .update({
                     color: n,
