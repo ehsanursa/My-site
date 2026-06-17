@@ -130,12 +130,18 @@
               let n = Number(prompt("نمره امروز 1 تا 5"));
 
               if (n >= 1 && n <= 5) {
-                await cliennt
-                  .from("tracker")
-                  .update({
-                    color: n,
-                  })
-                  .eq("day", item.day);
+               let {error} = await client
+.from("tracker")
+.update({
+  color: n,
+})
+.eq("day", item.day);
+
+console.log(error);
+
+if(!error){
+  d.style.background = colors[n];
+}
 
                 d.style.background = colors[n];
               }
@@ -199,4 +205,3 @@
     </script>
   </body>
 </html>
-
