@@ -1,185 +1,197 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Habit Tracker</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Habit Tracker</title>
 
-<script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
 
-<style>
+    <style>
+      body {
+        background: #111;
+        color: white;
+        font-family: tahoma;
+        text-align: center;
+        padding: 20px;
+      }
 
-body{
-    background:#111;
-    color:white;
-    font-family:tahoma;
-    text-align:center;
-    padding:20px;
-}
+      #tracker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: 700px;
+        margin: auto;
+      }
 
-#tracker{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    max-width:700px;
-    margin:auto;
-}
+      .day {
+        width: 30px;
+        height: 30px;
+        background: #333;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      #streakBox {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 20px auto;
+        max-width: 700px;
+      }
 
-.day{
-    width:30px;
-    height:30px;
-    background:#333;
-    border-radius:5px;
-    cursor:pointer;
-}
+      .green {
+        width: 30px;
+        height: 30px;
+        background: #00aa44;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="startDate"></h2>
+    <h3 id="daysCount"></h3>
 
-</style>
-</head>
-<body>
+    <div id="tracker"></div>
 
-<h2 id="startDate"></h2>
-<h3 id="daysCount"></h3>
+    <button onclick="resetTracker()">پاک کردن همه اطلاعات</button>
 
-<div id="tracker"></div>
+    <h2>Streak Tracker</h2>
 
-<button onclick="resetTracker()">
-پاک کردن همه اطلاعات</button>
-    
-<script>
+    <h3 id="streakDays"></h3>
 
-function getJalaliToday(){
+    <button onclick="resetStreak()">ریست</button>
 
-    const d = new Date();
+    <div id="streakBox"></div>
 
-    const j = jalaali.toJalaali(
-        d.getFullYear(),
-        d.getMonth()+1,
-        d.getDate()
-    );
+    <script>
+      function getJalaliToday() {
+        const d = new Date();
 
-    return `${j.jy}/${j.jm}/${j.jd}`;
-}
+        const j = jalaali.toJalaali(
+          d.getFullYear(),
+          d.getMonth() + 1,
+          d.getDate(),
+        );
 
+        return `${j.jy}/${j.jm}/${j.jd}`;
+      }
 
-const colors = {
-    0:"#333",
-    1:"#fff9c4",
-    2:"#fff176",
-    3:"#ffd54f",
-    4:"#ffc107",
-    5:"#ff9800"
-};
+      const colors = {
+        0: "#333",
+        1: "#fff9c4",
+        2: "#fff176",
+        3: "#ffd54f",
+        4: "#ffc107",
+        5: "#ff9800",
+      };
 
+      let data = JSON.parse(localStorage.getItem("habitTracker"));
 
-let data = JSON.parse(
-    localStorage.getItem("habitTracker")
-);
+      if (!data) {
+        data = {
+          start: getJalaliToday(),
+          dates: [getJalaliToday()],
+          scores: {},
+        };
 
-if(!data){
+        localStorage.setItem("habitTracker", JSON.stringify(data));
+      }
 
-    data = {
-        start:getJalaliToday(),
-        dates:[getJalaliToday()],
-        scores:{}
-    };
+      const today = getJalaliToday();
 
-    localStorage.setItem(
-        "habitTracker",
-        JSON.stringify(data)
-    );
-}
+      const lastDate = data.dates[data.dates.length - 1];
 
+      if (lastDate !== today) {
+        data.dates.push(today);
 
-const today = getJalaliToday();
+        localStorage.setItem("habitTracker", JSON.stringify(data));
+      }
 
-const lastDate =
-data.dates[data.dates.length-1];
+      document.getElementById("startDate").innerText =
+        "تاریخ شروع: " + data.start;
 
+      document.getElementById("daysCount").innerText =
+        "تعداد روزها: " + data.dates.length;
 
-if(lastDate !== today){
+      const tracker = document.getElementById("tracker");
 
-    data.dates.push(today);
+      data.dates.forEach((date) => {
+        const box = document.createElement("div");
 
-    localStorage.setItem(
-        "habitTracker",
-        JSON.stringify(data)
-    );
-}
+        box.className = "day";
 
+        const score = data.scores[date] || 0;
 
-document.getElementById("startDate")
-.innerText =
-"تاریخ شروع: " + data.start;
+        box.style.background = colors[score];
 
-
-document.getElementById("daysCount")
-.innerText =
-"تعداد روزها: " + data.dates.length;
-
-
-const tracker =
-document.getElementById("tracker");
-
-
-data.dates.forEach(date=>{
-
-    const box =
-    document.createElement("div");
-
-    box.className="day";
-
-    const score =
-    data.scores[date] || 0;
-
-    box.style.background =
-    colors[score];
-
-
-    if(date === today){
-
-        box.onclick = ()=>{
-
-            let n = prompt(
-                "نمره امروز (1 تا 5)"
-            );
+        if (date === today) {
+          box.onclick = () => {
+            let n = prompt("نمره امروز (1 تا 5)");
 
             n = Number(n);
 
-            if(n>=1 && n<=5){
+            if (n >= 1 && n <= 5) {
+              data.scores[date] = n;
 
-                data.scores[date]=n;
+              localStorage.setItem("habitTracker", JSON.stringify(data));
 
-                localStorage.setItem(
-                    "habitTracker",
-                    JSON.stringify(data)
-                );
-
-                box.style.background =
-                colors[n];
+              box.style.background = colors[n];
             }
+          };
+        }
 
-        };
+        tracker.appendChild(box);
+      });
 
-    }
+      function resetTracker() {
+        if (confirm("همه اطلاعات پاک شود؟")) {
+          localStorage.removeItem("habitTracker");
 
-    tracker.appendChild(box);
+          location.reload();
+        }
+      }
 
-});
+      let streak = JSON.parse(localStorage.getItem("streak")) || {
+        start: new Date().toISOString().split("T")[0],
+        resets: 0,
+      };
 
-    function resetTracker(){
+      function drawStreak() {
+        let box = document.getElementById("streakBox");
 
-    if(confirm("همه اطلاعات پاک شود؟")){
+        box.innerHTML = "";
 
-        localStorage.removeItem(
-            "habitTracker"
-        );
+        let start = new Date(streak.start);
 
-        location.reload();
+        let now = new Date();
 
-    }
+        let days = Math.floor((now - start) / 86400000) + 1;
 
-}
-</script>
+        document.getElementById("streakDays").innerHTML =
+          "روزهای فعلی: " + days + " | تعداد ریست: " + streak.resets;
 
-</body>
+        for (let i = 0; i < days; i++) {
+          let d = document.createElement("div");
+
+          d.className = "green";
+
+          box.appendChild(d);
+        }
+      }
+
+      function resetStreak() {
+        if (confirm("ریست شود؟")) {
+          streak.start = new Date().toISOString().split("T")[0];
+
+          streak.resets++;
+
+          localStorage.setItem("streak", JSON.stringify(streak));
+
+          drawStreak();
+        }
+      }
+
+      drawStreak();
+    </script>
+  </body>
 </html>
